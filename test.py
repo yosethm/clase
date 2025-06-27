@@ -90,7 +90,7 @@ async def main(page: ft.Page):
     page.title = "Piano App"
     page.theme_mode = ft.ThemeMode.DARK
     page.theme = ft.Theme(
-        color_scheme=ft.ColorScheme(
+        color_scheme=ft.colorScheme(
             primary=ft.colors.BLUE,
             secondary=ft.colors.AMBER,
             background=ft.colors.SURFACE
