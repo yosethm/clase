@@ -8,11 +8,9 @@ from io import BytesIO
 
 nest_asyncio.apply()
 
-# Variables globales de configuración
 volumen = 0.5
 duracion = 0.5
 
-# Lista de notas musicales con su frecuencia
 notas = [
     ("Do", 261.63), ("Do#", 277.18),
     ("Re", 293.66), ("Re#", 311.13),
@@ -22,7 +20,6 @@ notas = [
     ("La#", 466.16), ("Si", 493.88)
 ]
 
-# Genera audio HTML para sonar en el navegador
 def generar_audio_html(freq, duracion=0.5, volumen=0.5, sr=44100):
     t = np.linspace(0, duracion, int(sr * duracion), False)
     onda = np.sin(2 * np.pi * freq * t) * volumen
@@ -31,11 +28,10 @@ def generar_audio_html(freq, duracion=0.5, volumen=0.5, sr=44100):
     b64 = base64.b64encode(buf.getvalue()).decode()
     return f'<audio autoplay="true" src="data:audio/wav;base64,{b64}"></audio>'
 
-# Crea una tecla del piano
 def tecla_piano(nota, freq, registrar_callback, page):
     es_sostenida = '#' in nota
-    color_texto = ft.Colors.WHITE if es_sostenida else ft.Colors.BLACK
-    color_fondo = ft.Colors.BLACK if es_sostenida else ft.Colors.WHITE
+    color_texto = ft.colors.WHITE if es_sostenida else ft.colors.BLACK
+    color_fondo = ft.colors.BLACK if es_sostenida else ft.colors.WHITE
     ancho = 40 if es_sostenida else 60
     alto = 120 if es_sostenida else 200
 
@@ -46,18 +42,16 @@ def tecla_piano(nota, freq, registrar_callback, page):
         width=ancho,
         height=alto,
         bgcolor=color_fondo,
-        border=ft.border.all(1, ft.Colors.GREY_700),
+        border=ft.border.all(1, ft.colors.GREY_700),
         border_radius=5,
         ink=True
     )
 
-    # Reproduce nota y anima visualmente la tecla
     def animar_nota(e):
-        contenedor.bgcolor = ft.Colors.BLUE_200 if not es_sostenida else ft.Colors.BLUE_GREY_400
-        texto.color = ft.Colors.BLACK
+        contenedor.bgcolor = ft.colors.BLUE_200 if not es_sostenida else ft.colors.BLUE_GREY_400
+        texto.color = ft.colors.BLACK
         contenedor.update()
 
-        # Reproducir sonido en navegador
         html_audio = generar_audio_html(freq, duracion, volumen)
         page.dialog = ft.AlertDialog(content=ft.Html(html_audio))
         page.dialog.open = True
@@ -71,64 +65,51 @@ def tecla_piano(nota, freq, registrar_callback, page):
     contenedor.on_click = animar_nota
     return contenedor
 
-# Función principal que crea la interfaz
 async def main(page: ft.Page):
     global volumen, duracion
 
-    # Cambia el tema claro/oscuro
     def cambiar_tema(e):
         page.theme_mode = ft.ThemeMode.DARK if e.control.value else ft.ThemeMode.LIGHT
         page.update()
 
-    # Registra la nota tocada en el historial
     def registrar_nota(nota):
         historial.controls.append(ft.Text(f"Nota tocada: {nota}"))
         page.update()
 
-    # Cambia el volumen
     def cambiar_vol(e):
-        global volumen
+        nonlocal volumen
         volumen = e.control.value
 
-    # Cambia la duración
     def cambiar_dur(e):
-        global duracion
+        nonlocal duracion
         duracion = e.control.value
 
-    # Cierra la aplicación
     def cerrar_app(e):
         page.window_destroy()
 
-    # Configuración inicial de la página
     page.title = "Piano App"
     page.theme_mode = ft.ThemeMode.DARK
     page.theme = ft.Theme(
         color_scheme=ft.ColorScheme(
-            primary=ft.Colors.BLUE,
-            secondary=ft.Colors.AMBER,
-            background=ft.Colors.SURFACE
+            primary=ft.colors.BLUE,
+            secondary=ft.colors.AMBER,
+            background=ft.colors.SURFACE
         )
     )
     page.update()
 
-    # Historial de notas
     historial = ft.ListView(height=200, expand=True, auto_scroll=True)
 
-    # Botón de opciones
     menu = ft.PopupMenuButton(
-        items=[
-            ft.PopupMenuItem(text="Cerrar aplicación", on_click=cerrar_app)
-        ]
+        items=[ft.PopupMenuItem(text="Cerrar aplicación", on_click=cerrar_app)]
     )
 
-    # Cabecera de la app
     header = ft.Row([
         ft.Text("Piano App", size=26, weight="bold"),
         ft.Container(expand=True),
         menu
     ])
 
-    # Panel de configuración
     info_panel = ft.Container(
         content=ft.Column([
             ft.Text("Configuración", size=18, weight="bold"),
@@ -139,10 +120,9 @@ async def main(page: ft.Page):
         padding=15,
         width=250,
         border_radius=10,
-        bgcolor=ft.Colors.SURFACE
+        bgcolor=ft.colors.SURFACE
     )
 
-    # Construcción del teclado
     teclas_blancas = [tecla_piano(n, f, registrar_nota, page) for n, f in notas if '#' not in n]
     teclas_negras = [tecla_piano(n, f, registrar_nota, page) for n, f in notas if '#' in n]
 
@@ -158,7 +138,6 @@ async def main(page: ft.Page):
         )
     ])
 
-    # Layout general
     page.add(
         header,
         ft.Divider(),
@@ -169,6 +148,5 @@ async def main(page: ft.Page):
         ])
     )
 
-# Inicia la app
+# Corre la app con Flet
 ft.app(target=main)
-
