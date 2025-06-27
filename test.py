@@ -53,8 +53,7 @@ def tecla_piano(nota, freq, registrar_callback, page):
         contenedor.update()
 
         html_audio = generar_audio_html(freq, duracion, volumen)
-        page.dialog = ft.AlertDialog(content=ft.Html(html_audio))
-        page.dialog.open = True
+        page.controls.append(ft.Html(html_audio))
         page.update()
 
         contenedor.bgcolor = color_fondo
@@ -90,7 +89,7 @@ async def main(page: ft.Page):
     page.title = "Piano App"
     page.theme_mode = ft.ThemeMode.DARK
     page.theme = ft.Theme(
-        color_scheme=ft.colorScheme(
+        color_scheme=ft.ColorScheme(
             primary=ft.colors.BLUE,
             secondary=ft.colors.AMBER,
             background=ft.colors.SURFACE
@@ -148,5 +147,4 @@ async def main(page: ft.Page):
         ])
     )
 
-# Corre la app con Flet
 ft.app(target=main)
