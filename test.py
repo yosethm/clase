@@ -170,8 +170,5 @@ async def main(page: ft.Page):
     )
 
 # Inicia la app
-def run():
-    loop = asyncio.get_event_loop()
-    loop.create_task(ft.app_async(target=main))
+ft.app(target=main)
 
-run()
